@@ -1,5 +1,15 @@
 PyMata
 ======
+SpeedImprovement branch works to improve PyMata referesh rates.
+
+The communication between PyMata.Serial thread and PyMata.CommandHandler thread makes a big performance hit to the PyMata library. 
+
+Changes:
+
+2015/09/14 Move serial reads into the PyMata.CommandHandler run method, eliminating the need for a separate thread for PyMata.Serial
+
+
+======
 PyMata is a high performance, multi-threaded, non-blocking Python client for the Firmata Protocol that supports
 the complete StandardFirmata protocol.
 
