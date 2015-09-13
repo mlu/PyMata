@@ -26,7 +26,8 @@ import sys
 import serial
 
 
-class PyMataSerial(threading.Thread):
+#class PyMataSerial(threading.Thread):
+class PyMataSerial:
     """
      This class manages the serial port for Arduino serial communications
     """
@@ -47,12 +48,12 @@ class PyMataSerial(threading.Thread):
         self.port_id = port_id
         self.command_deque = command_deque
 
-        threading.Thread.__init__(self)
-        self.daemon = True
+        #threading.Thread.__init__(self)
+        # self.daemon = True
         self.arduino = serial.Serial(self.port_id, self.baud_rate,
                                      timeout=int(self.timeout), writeTimeout=0)
 
-        self.stop_event = threading.Event()
+        # self.stop_event = threading.Event()
 
         # without this, running python 3.4 is extremely sluggish
         if sys.platform == 'linux':
@@ -60,10 +61,12 @@ class PyMataSerial(threading.Thread):
             self.arduino.nonblocking()
 
     def stop(self):
-        self.stop_event.set()
+        #self.stop_event.set()
+        pass
 
     def is_stopped(self):
-        return self.stop_event.is_set()
+		return true
+        #return self.stop_event.is_set()
 
     def open(self, verbose):
         """
@@ -108,28 +111,28 @@ class PyMataSerial(threading.Thread):
         else:
             self.arduino.write(bytes([ord(data)]))
 
-    # noinspection PyExceptClausesOrder
-    def run(self):
-        """
-        This method continually runs. If an incoming character is available on the serial port
-        it is read and placed on the _command_deque
-        @return: Never Returns
-        """
-        while not self.is_stopped():
-            # we can get an OSError: [Errno9] Bad file descriptor when shutting down
-            # just ignore it
-            try:
-                if self.arduino.inWaiting():
-                    c = self.arduino.read()
-                    self.command_deque.append(ord(c))
-                else:
-                    time.sleep(.1)
-            except OSError:
-                pass
-            except IOError:
-                self.stop()
-        self.close()
-
+#    # noinspection PyExceptClausesOrder
+#    def run(self):
+#        """
+#        This method continually runs. If an incoming character is available on the serial port
+#        it is read and placed on the _command_deque
+#        @return: Never Returns
+#        """
+#        while not self.is_stopped():
+#            # we can get an OSError: [Errno9] Bad file descriptor when shutting down
+#            # just ignore it
+#            try:
+#                if self.arduino.inWaiting():
+#                    c = self.arduino.read()
+#                    self.command_deque.append(ord(c))
+#                else:
+#                    time.sleep(.1)
+#            except OSError:
+#                pass
+#            except IOError:
+#                self.stop()
+#        self.close()
+#
 
 
 

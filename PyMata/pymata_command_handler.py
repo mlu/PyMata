@@ -754,9 +754,8 @@ class PyMataCommandHandler(threading.Thread):
         self.command_dispatch.update({self.STEPPER_DATA: [self.stepper_version_response, 2]})
 
         while not self.is_stopped():
-            if len(self.pymata.command_deque):
-                # get next byte from the deque and process it
-                data = self.pymata.command_deque.popleft()
+            if self.pymata.transport.arduino.inWaiting():
+                data = ord(self.pymata.transport.arduino.read())
 
                 # this list will be populated with the received data for the command
                 command_data = []
@@ -765,9 +764,10 @@ class PyMataCommandHandler(threading.Thread):
                 if data == self.START_SYSEX:
                     # next char is the actual sysex command
                     # wait until we can get data from the deque
-                    while len(self.pymata.command_deque) == 0:
+                    while self.pymata.transport.arduino.inWaiting()==0:
                         pass
-                    sysex_command = self.pymata.command_deque.popleft()
+                    # sysex_command = self.pymata.command_deque.popleft()
+                    sysex_command = ord(self.pymata.transport.arduino.read())
                     # retrieve the associated command_dispatch entry for this command
                     dispatch_entry = self.command_dispatch.get(sysex_command)
 
@@ -778,9 +778,9 @@ class PyMataCommandHandler(threading.Thread):
                     end_of_sysex = False
                     while not end_of_sysex:
                         # wait for more data to arrive
-                        while len(self.pymata.command_deque) == 0:
+                        while self.pymata.transport.arduino.inWaiting()==0:
                             pass
-                        data = self.pymata.command_deque.popleft()
+                        data = ord(self.pymata.transport.arduino.read())
                         if data != self.END_SYSEX:
                             command_data.append(data)
                         else:
@@ -821,9 +821,9 @@ class PyMataCommandHandler(threading.Thread):
                     #look at the number of args that the selected method requires
                     # now get that number of bytes to pass to the called method
                     for i in range(num_args):
-                        while len(self.pymata.command_deque) == 0:
+                        while self.pymata.transport.arduino.inWaiting()==0:
                             pass
-                        data = self.pymata.command_deque.popleft()
+                        data = ord(self.pymata.transport.arduino.read())
                         command_data.append(data)
                         #go execute the command with the argument list
                     method(command_data)
@@ -831,7 +831,7 @@ class PyMataCommandHandler(threading.Thread):
                     # go to the beginning of the loop to process the next command
                     continue
                 else:
-                    time.sleep(.1)
+                    time.sleep(.05)
 
 
 

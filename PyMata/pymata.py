@@ -141,7 +141,7 @@ class PyMata:
                 time.sleep(1)
 
             # Start the data receive thread
-            self.transport.start()
+            #self.transport.start()
 
             # Instantiate the command handler
             self._command_handler = PyMataCommandHandler(self)
